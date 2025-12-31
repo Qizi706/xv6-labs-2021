@@ -407,3 +407,4 @@ myapi.key:
 
 
 .PHONY: handin tarball tarball-pref clean grade handin-check
+CFLAGS += -Wno-infinite-recursion
