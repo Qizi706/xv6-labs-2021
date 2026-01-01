@@ -19,7 +19,6 @@ extern void forkret(void);
 static void freeproc(struct proc *p);
 
 extern char trampoline[]; // trampoline.S
-
 // helps ensure that wakeups of wait()ing
 // parents are not lost. helps obey the
 // memory model when using p->parent.
@@ -291,6 +290,9 @@ fork(void)
 
   // copy saved user registers.
   *(np->trapframe) = *(p->trapframe);
+
+  // copy the trace mask from the parent to child process
+  np->trace_mask = p->trace_mask;
 
   // Cause fork to return 0 in the child.
   np->trapframe->a0 = 0;
@@ -633,11 +635,11 @@ void
 procdump(void)
 {
   static char *states[] = {
-  [UNUSED]    "unused",
-  [SLEEPING]  "sleep ",
-  [RUNNABLE]  "runble",
-  [RUNNING]   "run   ",
-  [ZOMBIE]    "zombie"
+  [UNUSED]    = "unused",
+  [SLEEPING]  = "sleep ",
+  [RUNNABLE]  = "runble",
+  [RUNNING]   = "run   ",
+  [ZOMBIE]    = "zombie"
   };
   struct proc *p;
   char *state;
