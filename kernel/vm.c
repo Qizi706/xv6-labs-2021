@@ -346,10 +346,28 @@ int
 copyout(pagetable_t pagetable, uint64 dstva, char *src, uint64 len)
 {
   uint64 n, va0, pa0;
+  pte_t *pte;
 
   while(len > 0){
     va0 = PGROUNDDOWN(dstva);
-    pa0 = walkaddr(pagetable, va0);
+    if (va0 >= MAXVA)
+      return -1;
+
+    if ((pte = walk(pagetable, va0, 0)) == 0 || (*pte & PTE_V) == 0)
+      return -1;
+
+    if (*pte & PTE_COW) {
+      if (store_page_fault(pagetable, va0) < 0)
+        return -1;
+
+      if ((pte = walk(pagetable, va0, 0)) == 0 || (*pte & PTE_V) == 0)
+        return -1;
+    }
+
+    if ((*pte & PTE_W) == 0)
+      return -1;
+
+    pa0 = PTE2PA(*pte);
     if(pa0 == 0)
       return -1;
     n = PGSIZE - (dstva - va0);
@@ -439,6 +457,9 @@ store_page_fault(pagetable_t pagetable, uint64 va)
   pte_t *pte;
   uint64 pa;
   uint flags;
+
+  if (va >= MAXVA)
+    return -1;
 
   if((pte = (pte_t*)walk(pagetable, va, 0)) == 0)
     panic("store_page_fault: pte should exist");

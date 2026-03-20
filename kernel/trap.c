@@ -68,15 +68,14 @@ usertrap(void)
   } else if (r_scause() == 15) {
     // store page fault
     uint64 va = r_stval();
-
-    if (p->killed)
-      exit(-1);
-
-    // intr_on();
-
-    if (store_page_fault(p->pagetable, va) != 0) {
+    if (va >= MAXVA || va >= p->sz)
       p->killed = 1;
+    else {
+      if (store_page_fault(p->pagetable, va) != 0) {
+        p->killed = 1;
+      }
     }
+
   } else if((which_dev = devintr()) != 0){
     // ok
   } else {

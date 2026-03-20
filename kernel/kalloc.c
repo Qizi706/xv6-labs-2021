@@ -125,7 +125,7 @@ int
 kget_ref(void *pa)
 {
   if(((uint64)pa % PGSIZE) != 0 || (char*)pa < end || (uint64)pa >= PHYSTOP)
-    panic("ket_ref");
+    panic("kget_ref");
   int c;
   acquire(&ref_count.lock);
   c = ref_count.count[(uint64)pa / PGSIZE];
