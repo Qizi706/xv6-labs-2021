@@ -1,0 +1,21 @@
+# 1. 全局配置：适用于所有文件
+CompileFlags:
+  Add:
+    - "-target"
+    - "riscv64-linux-gnu"
+    - "-I."
+    - "-I./kernel"
+    - "-DLAB_MULTITHREADING"
+  Compiler: riscv64-linux-gnu-gcc
+
+---
+# 2. 条件配置：仅当打开 .h 文件时生效
+If:
+  PathMatch: kernel/defs\.h  # 匹配所有以 .h 结尾的文件
+
+CompileFlags:
+  Add:
+    - "-include"
+    - "kernel/types.h"
+    - "-include"
+    - "kernel/riscv.h"
