@@ -54,11 +54,6 @@ binit(void)
     initsleeplock(&b->lock, "buffer");
     bcache.buckets[0].next->prev = b;
     bcache.buckets[0].next = b;
-    // b->next = bcache.head.next;
-    // b->prev = &bcache.head;
-    // initsleeplock(&b->lock, "buffer");
-    // bcache.head.next->prev = b;
-    // bcache.head.next = b;
   }
 }
 
@@ -209,9 +204,10 @@ bpin(struct buf *b) {
 
 void
 bunpin(struct buf *b) {
-  acquire(&bcache.lock);
+  int id = b->blockno % NBUCKET;
+  acquire(&bcache.bucket_locks[id]);
   b->refcnt--;
-  release(&bcache.lock);
+  release(&bcache.bucket_locks[id]);
 }
 
 

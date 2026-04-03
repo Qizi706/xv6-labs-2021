@@ -109,6 +109,6 @@ kalloc(void)
   pop_off();
 
   if(r)
-    memset((char*)r, 5, PGSIZE); // fill with junk
+    memset((char*)r, 1, PGSIZE); // fill with junk
   return (void*)r;
 }
