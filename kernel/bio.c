@@ -183,7 +183,7 @@ brelse(struct buf *b)
 
   releasesleep(&b->lock);
 
-  int id = b->blockno & NBUCKET;
+  int id = b->blockno % NBUCKET;
 
   acquire(&bcache.bucket_locks[id]);
   b->refcnt--;
